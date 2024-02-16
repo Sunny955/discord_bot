@@ -55,7 +55,7 @@ client.on("messageCreate", async (message) => {
 
   if (command === "weather") {
     const location = args[0];
-    const day = args[1].toLowerCase();
+    const day = args[1]?.toLowerCase();
 
     if (!location || !day) {
       return message.reply("Please provide both location and day!");

@@ -28,8 +28,8 @@ async function getWeather(location, day) {
 
     return responseString;
   } catch (error) {
-    console.error("Error fetching weather:", error);
-    throw new Error("Error fetching weather");
+    console.log("Error fetching weather:", error);
+    throw new Errror(error);
   }
 }
 
