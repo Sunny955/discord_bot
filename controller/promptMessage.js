@@ -30,10 +30,15 @@ const promptMessage = async (client, input, message) => {
   const response = await result.response;
   let text = response.text();
   const maxLen = 2000;
-  while (text.length > 0) {
-    const currMessage = text.substring(0, maxLen);
-    text = text.substring(maxLen);
+  while (text.length > maxLen) {
+    let lastSpaceIndex = text.substring(0, maxLen).lastIndexOf(" ");
+    if (lastSpaceIndex === -1) lastSpaceIndex = maxLen;
+    const currMessage = text.substring(0, lastSpaceIndex);
+    text = text.substring(lastSpaceIndex).trim();
     message.reply(currMessage);
+  }
+  if (text.length > 0) {
+    message.reply(text);
   }
 };
 
