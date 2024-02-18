@@ -14,6 +14,7 @@ const { scheduleMorningForecast } = require("./controller/schedule");
 const { validateCity } = require("./utils/validateAddress");
 const { getWeather } = require("./controller/getWeather");
 const { getAqi } = require("./controller/getAqi");
+const { promptMessage } = require("./controller/promptMessage");
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
@@ -153,6 +154,9 @@ client.on("messageCreate", async (message) => {
       console.error("Got error in /aqi command", error);
       message.channel.send("Sorry unable to process your request now!");
     }
+  } else if (command === "prompt") {
+    const input = message.content.slice("/prompt".length).trim();
+    await promptMessage(client, input, message);
   } else {
     message.reply("Command not applicable!");
   }
