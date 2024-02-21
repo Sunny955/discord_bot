@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "start:dev": "TZ=Asia/Kolkata nodemon app.js",
+    "start": "TZ=Asia/Kolkata node app.js"
   },
   "keywords": [],
   "author": "",

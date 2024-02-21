@@ -15,6 +15,7 @@ const { validateCity } = require("./utils/validateAddress");
 const { getWeather } = require("./controller/getWeather");
 const { getAqi } = require("./controller/getAqi");
 const { promptMessage } = require("./controller/promptMessage");
+const { gifMessage } = require("./controller/gifMessage");
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
@@ -23,6 +24,7 @@ const client = new Client({
     IntentsBitField.Flags.MessageContent,
     IntentsBitField.Flags.DirectMessages,
     IntentsBitField.Flags.GuildEmojisAndStickers,
+    IntentsBitField.Flags.GuildMessageReactions
   ],
 });
 
@@ -157,6 +159,12 @@ client.on("messageCreate", async (message) => {
   } else if (command === "prompt") {
     const input = message.content.slice("/prompt".length).trim();
     await promptMessage(client, input, message);
+  } else if (command === "gifbot") {
+    const query = args.join(" ");
+    if (!query) {
+      return message.reply("Please provide a search query for the GIF!");
+    }
+    await gifMessage(query, message);
   } else {
     message.reply("Command not applicable!");
   }
