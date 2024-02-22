@@ -24,7 +24,7 @@ const client = new Client({
     IntentsBitField.Flags.MessageContent,
     IntentsBitField.Flags.DirectMessages,
     IntentsBitField.Flags.GuildEmojisAndStickers,
-    IntentsBitField.Flags.GuildMessageReactions
+    IntentsBitField.Flags.GuildMessageReactions,
   ],
 });
 
@@ -158,8 +158,15 @@ client.on("messageCreate", async (message) => {
     }
   } else if (command === "prompt") {
     const input = message.content.slice("/prompt".length).trim();
-    await promptMessage(client, input, message);
-  } else if (command === "gifbot") {
+    try {
+      await promptMessage(client, input, message);
+    } catch (error) {
+      console.log("error in prompt section ", promptMessage);
+      message.reply(
+        "Error getting data, maybe explicit content or server error"
+      );
+    }
+  } else if (command === "gif") {
     const query = args.join(" ");
     if (!query) {
       return message.reply("Please provide a search query for the GIF!");
