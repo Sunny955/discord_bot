@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { EmbedBuilder,AttachmentBuilder} = require("discord.js");
+const { EmbedBuilder, AttachmentBuilder } = require("discord.js");
 
 const gifMessage = async (query, message) => {
   try {
@@ -19,12 +19,17 @@ const gifMessage = async (query, message) => {
     const embeds = gifUrls.map((gifUrl, index) => {
       const embed = new EmbedBuilder();
       embed.setTitle(gifTitle);
+      embed.setURL(gifUrl);
       embed.setDescription(`${index + 1}/${gifUrls.length}`);
       embed.setThumbnail(gifUrl);
+      embed.setFooter({
+        text: `Powered by Giphy | Query: ${query}`,
+        iconURL: "https://i.imgur.com/9QaZdB8.png",
+      });
       return embed;
     });
 
-    const embedMessage = await message.channel.send({embeds:embeds});
+    const embedMessage = await message.channel.send({ embeds: embeds });
 
     const emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
 
@@ -43,7 +48,6 @@ const gifMessage = async (query, message) => {
       time: 60_000,
       max: 1,
     });
-
 
     collector.on("collect", (reaction, user) => {
       const index = emojis.indexOf(reaction.emoji.name);
