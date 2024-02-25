@@ -6,7 +6,7 @@ db.query = util.promisify(db.query);
 
 const scheduleMorningForecast = (client) => {
   cron.schedule(
-    "0 2 * * *",
+    "30 1 * * *",
     async () => {
       try {
         const query = "SELECT id FROM user WHERE location IS NOT NULL";
