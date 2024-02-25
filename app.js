@@ -69,7 +69,7 @@ client.on("messageCreate", async (message) => {
     } catch (error) {
       console.error("Error fetching weather:", error);
       message.channel.send(
-        "Sorry, there was an error while fetching the weather. Please check input city and day"
+        "Sorry, there was an error while fetching the weather. Please check input city"
       );
     }
   } else if (command === "setlocation") {
@@ -171,6 +171,13 @@ client.on("messageCreate", async (message) => {
       return message.reply("Please provide a search query for the GIF!");
     }
     await gifMessage(query, message);
+  } else if (command === "commands") {
+    return message.channel.send(`Applicable commands are: 
+    1.  **/weather** <city_name> - get current weather of a city
+    2.  **/aqi** <city> - get current AQI of a city
+    3.  **/setlocation** - set the location to receive weather notifications
+    4. **/GIF** <gif_name> - add gif reactions
+    5. **/commands** - all applicable commands`);
   } else {
     message.reply("Command not applicable!");
   }
