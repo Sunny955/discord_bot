@@ -58,14 +58,13 @@ client.on("messageCreate", async (message) => {
 
   if (command === "weather") {
     const location = args[0];
-    const day = args[1]?.toLowerCase();
 
-    if (!location || !day) {
-      return message.reply("Please provide both location and day!");
+    if (!location) {
+      return message.reply("Please provide location");
     }
 
     try {
-      const weatherData = await getWeather(location, day);
+      const weatherData = await getWeather(location);
       message.channel.send(`${weatherData}`);
     } catch (error) {
       console.error("Error fetching weather:", error);
