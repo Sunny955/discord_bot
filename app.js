@@ -16,6 +16,7 @@ const { getWeather } = require("./controller/getWeather");
 const { getAqi } = require("./controller/getAqi");
 const { promptMessage } = require("./controller/promptMessage");
 const { gifMessage } = require("./controller/gifMessage");
+const { backgroundJob } = require("./controller/background");
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
@@ -35,6 +36,7 @@ client.on("ready", () => {
 });
 
 scheduleMorningForecast(client);
+backgroundJob(client);
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot) {

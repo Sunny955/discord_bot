@@ -12,6 +12,13 @@ const scheduleMorningForecast = (client) => {
         const query = "SELECT id FROM user WHERE location IS NOT NULL";
         const output = await db.query(query);
 
+        if (!output || output.length === 0) {
+          console.log(
+            "No users found with location. Skipping morning forecast job."
+          );
+          return;
+        }
+
         for (const row of output) {
           const { id } = row;
           const output = await sendMorningForecast({ id });
