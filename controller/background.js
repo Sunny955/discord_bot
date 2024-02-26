@@ -55,7 +55,7 @@ async function checkWeatherChange(location) {
 }
 
 const backgroundJob = (client) => {
-  cron.schedule("*/5 * * * *", async () => {
+  cron.schedule("0 */3 * * *", async () => {
     try {
       const users = await fetchUsers();
 
@@ -84,16 +84,16 @@ const backgroundJob = (client) => {
         ) {
           user.send(
             `\`\`\`
-        ------------------------------------------------------
+        -----------------------------------------------------
         | Hey there weather is changing, Please take a look :  
-        ------------------------------------------------------
+        -----------------------------------------------------
         | Description: ${curr.weather[0].description}  
         | Temperature: ${temperatureCelsius} °C      
         | Wind Speed: ${curr.wind.speed} m/s     
         | Humidity: ${curr.main.humidity} %    
         | Date : ${date_time[0]}  
         | Time : ${time12}    
-        ------------------------------------------------------
+        -----------------------------------------------------
         \`\`\``
           );
         }
