@@ -16,6 +16,7 @@ const { getWeather } = require("./controller/getWeather");
 const { getAqi } = require("./controller/getAqi");
 const { promptMessage } = require("./controller/promptMessage");
 const { gifMessage } = require("./controller/gifMessage");
+const { backgroundJob } = require("./controller/background");
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
@@ -35,6 +36,7 @@ client.on("ready", () => {
 });
 
 scheduleMorningForecast(client);
+backgroundJob(client);
 
 client.on("messageCreate", async (message) => {
   if (message.author.bot) {
@@ -58,19 +60,18 @@ client.on("messageCreate", async (message) => {
 
   if (command === "weather") {
     const location = args[0];
-    const day = args[1]?.toLowerCase();
 
-    if (!location || !day) {
-      return message.reply("Please provide both location and day!");
+    if (!location) {
+      return message.reply("Please provide location");
     }
 
     try {
-      const weatherData = await getWeather(location, day);
+      const weatherData = await getWeather(location);
       message.channel.send(`${weatherData}`);
     } catch (error) {
       console.error("Error fetching weather:", error);
       message.channel.send(
-        "Sorry, there was an error while fetching the weather. Please check input city and day"
+        "Sorry, there was an error while fetching the weather. Please check input city"
       );
     }
   } else if (command === "setlocation") {
@@ -172,6 +173,13 @@ client.on("messageCreate", async (message) => {
       return message.reply("Please provide a search query for the GIF!");
     }
     await gifMessage(query, message);
+  } else if (command === "commands") {
+    return message.channel.send(`Applicable commands are: 
+    1.  **/weather** <city_name> - get current weather of a city
+    2.  **/aqi** <city> - get current AQI of a city
+    3.  **/setlocation** - set the location to receive weather notifications
+    4. **/GIF** <gif_name> - add gif reactions
+    5. **/commands** - all applicable commands`);
   } else {
     message.reply("Command not applicable!");
   }
