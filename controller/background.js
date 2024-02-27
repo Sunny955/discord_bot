@@ -1,4 +1,5 @@
 const cron = require("node-cron");
+const { client } = require("../config/redisConnect");
 const axios = require("axios");
 const util = require("util");
 const db = require("../config/dbConfig");
@@ -18,9 +19,19 @@ async function fetchUsers() {
 
 async function fetchWeather(location) {
   try {
+    const cachedWeather = await client.get(location);
+    if (cachedWeather) {
+      console.log(`Weather data for ${location} found in cache.`);
+      return JSON.parse(cachedWeather);
+    }
+
     const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${location}&cnt=40&appid=${process.env.API_KEY}`;
     const response = await axios.get(apiUrl);
-    return response.data;
+    const weatherdata = response.data;
+
+    await client.setEx(location, 10800, JSON.stringify(weatherdata));
+
+    return weatherdata;
   } catch (error) {
     console.error(
       `Error fetching weather data for location '${location}':`,
