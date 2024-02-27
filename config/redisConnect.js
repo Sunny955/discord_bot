@@ -1,5 +1,4 @@
 const redis = require("redis");
-const { promisify } = require("util");
 
 const client = redis.createClient({
   password: process.env.REDIS_DB_PASS,
