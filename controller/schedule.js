@@ -19,12 +19,14 @@ const scheduleMorningForecast = (client) => {
           return;
         }
 
-        for (const row of output) {
+        const sendPromises = output.map(async (row) => {
           const { id } = row;
           const output = await sendMorningForecast({ id });
           const user = await client.users.fetch(id);
-          user.send(output);
-        }
+          return user.send(output);
+        });
+
+        await Promise.all(sendPromises);
 
         console.log("Morning forecast sent to all users successfully");
       } catch (error) {

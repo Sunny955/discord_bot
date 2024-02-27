@@ -54,36 +54,28 @@ async function checkWeatherChange(location) {
   }
 }
 
-const backgroundJob = (client) => {
-  cron.schedule("0 */3 * * *", async () => {
-    try {
-      const users = await fetchUsers();
+async function fetchAndNotifyWeather(client, user) {
+  try {
+    const { id, location } = user;
+    const { prev, curr } = await checkWeatherChange(location);
 
-      if (!users || users.length === 0) {
-        console.log("No users found. Skipping background job.");
-        return;
-      }
-
-      for (const row of users) {
-        const { id, location } = row;
-        let { prev, curr } = await checkWeatherChange(location);
-        const user = await client.users.fetch(id);
-        const temperatureCelsius = (curr.main.temp - 273.15).toFixed(2);
-        const date_time = curr.dt_txt.split(" ");
-        const time12 = new Date(
-          `2000-01-01T${date_time[1]}`
-        ).toLocaleTimeString("en-US", {
+    if (
+      prev !== null &&
+      curr !== null &&
+      prev.weather[0].description !== curr.weather[0].description
+    ) {
+      const temperatureCelsius = (curr.main.temp - 273.15).toFixed(2);
+      const date_time = curr.dt_txt.split(" ");
+      const time12 = new Date(`2000-01-01T${date_time[1]}`).toLocaleTimeString(
+        "en-US",
+        {
           hour: "numeric",
           minute: "numeric",
           hour12: true,
-        });
-        if (
-          prev !== null &&
-          curr !== null &&
-          prev.weather[0].description !== curr.weather[0].description
-        ) {
-          user.send(
-            `\`\`\`
+        }
+      );
+
+      const message = `\`\`\`
         -----------------------------------------------------
         | Hey there weather is changing, Please take a look :  
         -----------------------------------------------------
@@ -94,10 +86,32 @@ const backgroundJob = (client) => {
         | Date : ${date_time[0]}  
         | Time : ${time12}    
         -----------------------------------------------------
-        \`\`\``
-          );
-        }
+        \`\`\``;
+
+      // Send notification to user
+      const user = await client.users.fetch(id);
+      user.send(message);
+    }
+  } catch (error) {
+    console.error("Error processing weather change for user:", user, error);
+    throw error;
+  }
+}
+
+const backgroundJob = (client) => {
+  cron.schedule("0 */3 * * *", async () => {
+    try {
+      const users = await fetchUsers();
+
+      if (!users || users.length === 0) {
+        console.log("No users found. Skipping background job.");
+        return;
       }
+
+      // Process users concurrently
+      await Promise.all(
+        users.map((user) => fetchAndNotifyWeather(client, user))
+      );
 
       console.log(
         `Background job ran successfully at ${new Date().toLocaleTimeString()}`
