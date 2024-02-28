@@ -17,6 +17,7 @@ const { getAqi } = require("./controller/getAqi");
 const { promptMessage } = require("./controller/promptMessage");
 const { gifMessage } = require("./controller/gifMessage");
 const { backgroundJob } = require("./controller/background");
+const { getLocation } = require("./controller/getLocation");
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
@@ -173,13 +174,20 @@ client.on("messageCreate", async (message) => {
       return message.reply("Please provide a search query for the GIF!");
     }
     await gifMessage(query, message);
+  } else if (command === "location") {
+    try {
+      await getLocation(message, message.author.id);
+    } catch (error) {
+      message.reply("Unable to process this command now");
+    }
   } else if (command === "commands") {
     return message.channel.send(`Applicable commands are: 
     1.  **/weather** <city_name> - get current weather of a city
     2.  **/aqi** <city> - get current AQI of a city
     3.  **/setlocation** - set the location to receive weather notifications
-    4. **/GIF** <gif_name> - add gif reactions
-    5. **/commands** - all applicable commands`);
+    4.  **/location - get current location of the user
+    5. **/GIF** <gif_name> - add gif reactions
+    6. **/commands** - all applicable commands`);
   } else {
     message.reply("Command not applicable!");
   }
