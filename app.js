@@ -185,7 +185,7 @@ client.on("messageCreate", async (message) => {
     1.  **/weather** <city_name> - get current weather of a city
     2.  **/aqi** <city> - get current AQI of a city
     3.  **/setlocation** - set the location to receive weather notifications
-    4.  **/location - get current location of the user
+    4.  **/location** - get current location of the user
     5. **/GIF** <gif_name> - add gif reactions
     6. **/commands** - all applicable commands`);
   } else {
