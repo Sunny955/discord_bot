@@ -11,13 +11,13 @@ const getLocation = async (message, id) => {
       let location = result[0].location;
       if (location === null) {
         message.reply(
-          `Hi ${message.author.username} you haven't setup you location kindly set it up using /setlocation command`
+          `Hi **${message.author.username}** you haven't setup you location kindly set it up using **/setlocation** command`
         );
         return;
       }
       location = location.charAt(0).toUpperCase() + location.slice(1);
       message.reply(
-        `Hi ${message.author.username} your current location is ${location}`
+        `Hi **${message.author.username}** your current location is **${location}**`
       );
     } else {
       message.reply("Sorry no data available!");

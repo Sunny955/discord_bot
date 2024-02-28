@@ -169,11 +169,15 @@ client.on("messageCreate", async (message) => {
       );
     }
   } else if (command === "gif") {
-    const query = args.join(" ");
-    if (!query) {
-      return message.reply("Please provide a search query for the GIF!");
+    try {
+      const query = args.join(" ");
+      if (!query) {
+        return message.reply("Please provide a search query for the GIF!");
+      }
+      await gifMessage(query, message);
+    } catch (error) {
+      message.reply("Unable to process this command right now!");
     }
-    await gifMessage(query, message);
   } else if (command === "location") {
     try {
       await getLocation(message, message.author.id);
