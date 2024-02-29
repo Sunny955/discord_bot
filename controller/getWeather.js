@@ -1,5 +1,6 @@
 const axios = require("axios");
-async function getWeather(location) {
+const { EmbedBuilder } = require("discord.js");
+async function getWeather(message, location) {
   const url = `https://api.openweathermap.org/data/2.5/forecast?q=${location}&cnt=8&appid=${process.env.API_KEY}`;
   try {
     const response = await axios.get(url);
@@ -29,19 +30,28 @@ async function getWeather(location) {
     const feelsLikeCelsius = (feelsLike - 273.15).toFixed(2);
     const parsedDay = "Today";
     const parseLoc = location.charAt(0).toUpperCase() + location.slice(1);
-    const responseString = `\`\`\`
-      ----------------------------------------------
-      | Weather in ${parseLoc} ${parsedDay}:         
-      ----------------------------------------------
-      | Description: ${weather.padEnd(10, " ")}
-      | Temperature: ${temperatureCelsius.toString().padEnd(2, " ")} °C  
-      | Feels like: ${feelsLikeCelsius.toString().padEnd(2, " ")} °C    
-      | Humidity: ${humidity.toString().padEnd(2, " ")} % 
-      | Wind Speed: ${windSpeed.toString().padEnd(2, " ")} m/s        
-      ----------------------------------------------
-      \`\`\``;
 
-    return responseString;
+    const embedMssg = new EmbedBuilder()
+      .setColor(0x6ca0d9)
+      .setTitle(`Weather in ${parseLoc} ${parsedDay}:-`)
+      .addFields(
+        { name: "Description", value: `${weather}`, inline: false },
+        {
+          name: "Temperature",
+          value: `${temperatureCelsius} °C`,
+          inline: false,
+        },
+        { name: "Feels like", value: `${feelsLikeCelsius} °C`, inline: false },
+        { name: "Humidity", value: `${humidity} %`, inline: false },
+        { name: "Wind Speed", value: `${windSpeed} m/s`, inline: false }
+      )
+      .setTimestamp()
+      .setFooter({
+        text: "Powered by Weathery",
+        iconURL: process.env.GIF_URL,
+      });
+
+    message.channel.send({ embeds: [embedMssg] });
   } catch (error) {
     console.log("Error fetching weather:", error);
     throw new Errror(error);

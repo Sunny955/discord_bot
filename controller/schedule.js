@@ -23,6 +23,9 @@ const scheduleMorningForecast = (client) => {
           const { id } = row;
           const output = await sendMorningForecast({ id });
           const user = await client.users.fetch(id);
+          if (typeof output === "object") {
+            return user.send({ embeds: [output] });
+          }
           return user.send(output);
         });
 

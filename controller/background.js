@@ -3,6 +3,7 @@ const { client } = require("../config/redisConnect");
 const axios = require("axios");
 const util = require("util");
 const db = require("../config/dbConfig");
+const { EmbedBuilder } = require("discord.js");
 db.query = util.promisify(db.query);
 
 async function fetchUsers() {
@@ -69,7 +70,6 @@ async function fetchAndNotifyWeather(client, user) {
   try {
     const { id, location } = user;
     const { prev, curr } = await checkWeatherChange(location);
-
     if (
       prev !== null &&
       curr !== null &&
@@ -77,6 +77,7 @@ async function fetchAndNotifyWeather(client, user) {
     ) {
       const temperatureCelsius = (curr.main.temp - 273.15).toFixed(2);
       const date_time = curr.dt_txt.split(" ");
+      const parseLoc = location.charAt(0).toUpperCase() + location.slice(1);
       const time12 = new Date(`2000-01-01T${date_time[1]}`).toLocaleTimeString(
         "en-US",
         {
@@ -86,22 +87,37 @@ async function fetchAndNotifyWeather(client, user) {
         }
       );
 
-      const message = `\`\`\`
-        -----------------------------------------------------
-        | Hey there weather is changing, Please take a look :  
-        -----------------------------------------------------
-        | Description: ${curr.weather[0].description}  
-        | Temperature: ${temperatureCelsius} °C      
-        | Wind Speed: ${curr.wind.speed} m/s     
-        | Humidity: ${curr.main.humidity} %    
-        | Date : ${date_time[0]}  
-        | Time : ${time12}    
-        -----------------------------------------------------
-        \`\`\``;
+      const embedMssg = new EmbedBuilder()
+        .setColor(0x6ca0d9)
+        .setTitle(`Weather update for your location ${parseLoc} :-`)
+        .setDescription("Hey there weather is changing, Please take a look :")
+        .addFields(
+          {
+            name: "Description",
+            value: `${curr.weather[0].description}`,
+            inline: false,
+          },
+          {
+            name: "Temperature",
+            value: `${temperatureCelsius} °C`,
+            inline: false,
+          },
+          { name: "Humidity", value: `${curr.main.humidity}`, inline: false },
+          {
+            name: "Wind Speed",
+            value: `${curr.wind.speed} m/s`,
+            inline: false,
+          },
+          { name: "Time", value: time12, inline: false }
+        )
+        .setFooter({
+          text: "Powered by Weathery",
+          iconURL: process.env.GIF_URL,
+        });
 
       // Send notification to user
       const user = await client.users.fetch(id);
-      user.send(message);
+      user.send({ embeds: [embedMssg] });
     }
   } catch (error) {
     console.error("Error processing weather change for user:", user, error);

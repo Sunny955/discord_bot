@@ -1,6 +1,7 @@
 const util = require("util");
 const db = require("../config/dbConfig");
 const axios = require("axios");
+const { EmbedBuilder } = require("discord.js");
 db.query = util.promisify(db.query);
 const sendMorningForecast = async function (data) {
   try {
@@ -16,19 +17,40 @@ const sendMorningForecast = async function (data) {
       let temp = (response.data.main.temp - 273.15).toFixed(2);
 
       if (response.data.cod === 200) {
-        const responseString = `\`\`\`
-        --------------------------------------------------------
-        | Hi @${name} Good Morning! 
-        | Your today's weather update for ${location}:  
-        --------------------------------------------------------
-        | Description: ${response.data.weather[0].description}  
-        | Temperature: ${temp} °C      
-        | Wind Speed: ${response.data.wind.speed} m/s     
-        | Humidity: ${response.data.main.humidity}%          
-        --------------------------------------------------------
-        \`\`\``;
+        const embedMssg = new EmbedBuilder()
+          .setColor(0x6ca0d9)
+          .setTitle(`Hi ${name} Good Morning 😃`)
+          .setDescription(`Weather report for ${location} Today :-`)
+          .addFields(
+            {
+              name: "Description",
+              value: `${response.data.weather[0].description}`,
+              inline: false,
+            },
+            {
+              name: "Temperature",
+              value: `${temp} °C`,
+              inline: false,
+            },
+            {
+              name: "Humidity",
+              value: `${response.data.main.humidity} %`,
+              inline: false,
+            },
+            {
+              name: "Wind Speed",
+              value: `${response.data.wind.speed} m/s`,
+              inline: false,
+            }
+          )
+          .setFooter({
+            text: "Powered by Weathery",
+            iconURL: process.env.GIF_URL,
+          });
 
-        return responseString;
+        return embedMssg;
+
+        // return responseString;
       } else {
         return `Hi ${name}! Sorry I am unable to get any weather updates now`;
       }

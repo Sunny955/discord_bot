@@ -67,8 +67,7 @@ client.on("messageCreate", async (message) => {
     }
 
     try {
-      const weatherData = await getWeather(location);
-      message.channel.send(`${weatherData}`);
+      await getWeather(message, location);
     } catch (error) {
       console.error("Error fetching weather:", error);
       message.channel.send(
@@ -153,7 +152,7 @@ client.on("messageCreate", async (message) => {
         location,
         day: today,
       });
-      message.reply(data);
+      message.channel.send({ embeds: [data] });
     } catch (error) {
       console.error("Got error in /aqi command", error);
       message.channel.send("Sorry unable to process your request now!");
