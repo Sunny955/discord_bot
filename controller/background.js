@@ -102,7 +102,7 @@ async function fetchAndNotifyWeather(client, user) {
             value: `${temperatureCelsius} °C`,
             inline: false,
           },
-          { name: "Humidity", value: `${curr.main.humidity}`, inline: false },
+          { name: "Humidity", value: `${curr.main.humidity} %`, inline: false },
           {
             name: "Wind Speed",
             value: `${curr.wind.speed} m/s`,
