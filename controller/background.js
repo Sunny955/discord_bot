@@ -126,7 +126,7 @@ async function fetchAndNotifyWeather(client, user) {
 }
 
 const backgroundJob = (client) => {
-  cron.schedule("0 */3 * * *", async () => {
+  cron.schedule("0 9-23/3 * * *", async () => {
     try {
       const users = await fetchUsers();
 
