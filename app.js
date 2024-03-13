@@ -60,7 +60,13 @@ client.on("messageCreate", async (message) => {
   const command = args.shift().toLowerCase();
 
   if (command === "weather") {
-    const location = args[0];
+    let location;
+
+    if (args[0] && args[1]) {
+      location = args[0] + " " + args[1];
+    } else if (args[0]) {
+      location = args[0];
+    }
 
     if (!location) {
       return message.reply("Please provide location");
