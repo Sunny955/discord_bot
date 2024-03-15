@@ -189,6 +189,22 @@ client.on("messageCreate", async (message) => {
     } catch (error) {
       message.reply("Unable to process this command now");
     }
+  } else if (command === "qr") {
+    const link = args[0];
+
+    if (!link) {
+      return message.reply("Please provide a link to generate QR code.");
+    }
+
+    try {
+      const qrImage = await qr.toDataURL(link);
+      message.channel.send({
+        files: [{ attachment: qrImage, name: "qr.png" }],
+      });
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      message.reply("Sorry, there was an error generating the QR code.");
+    }
   } else if (command === "commands") {
     return message.channel.send(`Applicable commands are: 
     1.  **/weather** <city_name> - get current weather of a city
