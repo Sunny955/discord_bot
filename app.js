@@ -1,5 +1,10 @@
 require("dotenv").config();
-const { Client, IntentsBitField } = require("discord.js");
+const {
+  Client,
+  IntentsBitField,
+  EmbedBuilder,
+  AttachmentBuilder,
+} = require("discord.js");
 const {
   addUser,
   checkUserExists,
@@ -18,6 +23,9 @@ const { promptMessage } = require("./controller/promptMessage");
 const { gifMessage } = require("./controller/gifMessage");
 const { backgroundJob } = require("./controller/background");
 const { getLocation } = require("./controller/getLocation");
+const isURL = require("is-url");
+const qr = require("qrcode");
+const dns = require("dns");
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
@@ -189,6 +197,43 @@ client.on("messageCreate", async (message) => {
     } catch (error) {
       message.reply("Unable to process this command now");
     }
+  } else if (command === "qr") {
+    const link = args[0];
+
+    if (!link) {
+      return message.reply("Please provide a link to generate QR code.");
+    }
+
+    if (!isURL(link)) {
+      return message.reply("Not a valid url, please check it once again!");
+    }
+
+    const domain = new URL(link).hostname;
+
+    dns.resolve(domain, async (err) => {
+      if (err) {
+        console.error("Error resolving domain:", err);
+        return message.reply(
+          "Sorry, the domain does not exist or cannot be resolved."
+        );
+      } else {
+        try {
+          const qrCodeImage = await qr.toBuffer(link, { scale: 8 });
+          const attachment = new AttachmentBuilder(qrCodeImage, {
+            name: "qrcode.png",
+          });
+          const embed = new EmbedBuilder()
+            .setTitle("QR Code")
+            .setImage("attachment://qrcode.png")
+            .setColor(0x0099ff);
+
+          message.reply({ embeds: [embed], files: [attachment] });
+        } catch (error) {
+          console.error("Error generating QR code:", error);
+          message.reply("Sorry, there was an error generating the QR code.");
+        }
+      }
+    });
   } else if (command === "commands") {
     return message.channel.send(`Applicable commands are: 
     1.  **/weather** <city_name> - get current weather of a city
@@ -196,7 +241,8 @@ client.on("messageCreate", async (message) => {
     3.  **/setlocation** - set the location to receive weather notifications
     4.  **/location** - get current location of the user
     5. **/GIF** <gif_name> - add gif reactions
-    6. **/commands** - all applicable commands`);
+    6. **/commands** - all applicable commands
+    7. **/qr** <URL> - generate QR for the given URL`);
   } else {
     message.reply("Command not applicable!");
   }

@@ -20,17 +20,9 @@ async function fetchUsers() {
 
 async function fetchWeather(location) {
   try {
-    // const cachedWeather = await client.get(location);
-    // if (cachedWeather) {
-    //   console.log(`Weather data for ${location} found in cache.`);
-    //   return JSON.parse(cachedWeather);
-    // }
-
     const apiUrl = `https://api.openweathermap.org/data/2.5/forecast?q=${location}&cnt=40&appid=${process.env.API_KEY}`;
     const response = await axios.get(apiUrl);
     const weatherdata = response.data;
-
-    // await client.setEx(location, 10800, JSON.stringify(weatherdata));
 
     return weatherdata;
   } catch (error) {
