@@ -1,5 +1,5 @@
 const axios = require("axios");
-const { EmbedBuilder, AttachmentBuilder } = require("discord.js");
+const { EmbedBuilder } = require("discord.js");
 
 const gifMessage = async (query, message) => {
   try {
