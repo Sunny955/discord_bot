@@ -23,9 +23,8 @@ const { promptMessage } = require("./controller/promptMessage");
 const { gifMessage } = require("./controller/gifMessage");
 const { backgroundJob } = require("./controller/background");
 const { getLocation } = require("./controller/getLocation");
-const isURL = require("is-url");
+const { validateURL } = require("@amiya_ranjan/valid_url");
 const qr = require("qrcode");
-const dns = require("dns");
 const client = new Client({
   intents: [
     IntentsBitField.Flags.Guilds,
@@ -204,36 +203,28 @@ client.on("messageCreate", async (message) => {
       return message.reply("Please provide a link to generate QR code.");
     }
 
-    if (!isURL(link)) {
-      return message.reply("Not a valid url, please check it once again!");
-    }
+    try {
+      await validateURL(link);
+      const qrCodeImage = await qr.toBuffer(link, { scale: 8 });
+      const attachment = new AttachmentBuilder(qrCodeImage, {
+        name: "qrcode.png",
+      });
+      const embed = new EmbedBuilder()
+        .setTitle("QR Code")
+        .setImage("attachment://qrcode.png")
+        .setColor(0x0099ff);
 
-    const domain = new URL(link).hostname;
-
-    dns.resolve(domain, async (err) => {
-      if (err) {
-        console.error("Error resolving domain:", err);
-        return message.reply(
-          "Sorry, the domain does not exist or cannot be resolved."
-        );
-      } else {
-        try {
-          const qrCodeImage = await qr.toBuffer(link, { scale: 8 });
-          const attachment = new AttachmentBuilder(qrCodeImage, {
-            name: "qrcode.png",
-          });
-          const embed = new EmbedBuilder()
-            .setTitle("QR Code")
-            .setImage("attachment://qrcode.png")
-            .setColor(0x0099ff);
-
-          message.reply({ embeds: [embed], files: [attachment] });
-        } catch (error) {
-          console.error("Error generating QR code:", error);
-          message.reply("Sorry, there was an error generating the QR code.");
-        }
+      message.reply({ embeds: [embed], files: [attachment] });
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      if (
+        error.message === "Invalid URL" ||
+        error.message === "DNS lookup fail"
+      ) {
+        return message.reply("Not a valid URL, please check it once again");
       }
-    });
+      message.reply("Sorry, there was an error generating the QR code.");
+    }
   } else if (command === "commands") {
     return message.channel.send(`Applicable commands are: 
     1.  **/weather** <city_name> - get current weather of a city
